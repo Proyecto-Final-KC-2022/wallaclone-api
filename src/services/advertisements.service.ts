@@ -40,8 +40,8 @@ async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdv
 
   try {
     const filters: Filters = {};
-    const skip = options.start;
-    const sortBy = options.sort;
+    const skip = Number(options.start);
+    const sortBy = String(options.sort);
 
     if (options.tags) {
       filters["tags"] = options.tags;
@@ -50,16 +50,16 @@ async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdv
       filters.forSale = options.forSale;
     }
     if (options.name) {
-      filters.name = new RegExp(`^${name}`, "i");
+      filters.name = new RegExp(`^${filters.name}`, "i");
     }
     if (options.price) {
       setPriceFilter(options.price as string, filters);
     }
     const advertisements: Array<IAdvertisement & { _id: any }>  = await Advertisement.list(
       filters,
-      Number(skip),
+      skip,
       Number(options.limit),
-      sortBy as string
+      sortBy
     );
     serviceResponse.data = advertisements; 
   } catch (error) {

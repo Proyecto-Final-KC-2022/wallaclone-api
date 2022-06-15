@@ -28,6 +28,9 @@ export class Advertisements implements Controller {
       price: req.query["price"]?.toString(),
       name: req.query["name"]?.toString()
     };
+    // const foo= {
+    //     bar: 'bar'
+    // }
 
     try {
       let controllerResponse: ResponseI<Array<IAdvertisement & { _id: any }>>;
