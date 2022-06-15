@@ -4,19 +4,22 @@
     "private": true,
     "scripts": {
         "start": "cross-env NODE_ENV=development && nodemon --exec ts-node ./bin/www.ts",
+        "initDB": "nodemon --exec ts-node ./src/initDB.ts",
         "build": "sh etc/build.sh"
     },
     "dependencies": {
         "cookie-parser": "~1.4.4",
+        "cross-env": "^7.0.3",
         "debug": "~2.6.9",
-        "dotenv": "^16.0.0",
+        "dotenv": "^16.0.1",
         "express": "~4.16.1",
         "http-errors": "~1.6.3",
         "jade": "~1.11.0",
         "log4js": "latest",
-        "cross-env": "^7.0.3",
         "module-alias": "^2.2.2",
+        "mongoose": "^6.3.8",
         "morgan": "~1.9.1",
+        "multer": "^1.4.5-lts.1",
         "rimraf": "^3.0.2"
     },
     "devDependencies": {

@@ -1,38 +1,52 @@
-import createError from 'http-errors';
+import createError from "http-errors";
 
-import express, { RequestHandler, ErrorRequestHandler  } from 'express';
-import path from 'path';
-import cookieParser from 'cookie-parser';
-import logger from 'morgan';
+import express, { RequestHandler, ErrorRequestHandler } from "express";
+import path from "path";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
 
-import indexRouter from './routes/index';
-import usersRouter from './routes/users';
+import indexRouter from "./routes/index";
+import usersRouter from "./routes/users";
+import ControllerI from "./controllers/models/controller.model";
+import { Advertisements } from "./controllers/advertisements.controller";
+import { MongooseConnection } from './connectMongoose';
+
+//Meter todos los controllers en este array
+const appControllers: Array<ControllerI> = [new Advertisements()];
 
 class App {
   public app: express.Application;
-
+  public mongooseConnection = new MongooseConnection();
   constructor() {
     this.app = express();
+    this.mongooseConnection.connect()
     this.config();
     this.routerSetup();
+    this.initializeControllers(appControllers);
     this.errorHandler();
   }
 
   private config() {
     // view engine setup
-    this.app.set('views', path.join(__dirname, 'views'));
-    this.app.set('view engine', 'jade');
+    this.app.set("views", path.join(__dirname, "views"));
+    this.app.set("view engine", "jade");
 
-    this.app.use(logger('dev'));
+    this.app.use(logger("dev"));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
-    this.app.use(express.static(path.join(__dirname, 'public')));
+    this.app.use(express.static(path.join(__dirname, "public")));
   }
 
   private routerSetup() {
-    this.app.use('/', indexRouter);
-    this.app.use('/users', usersRouter);
+    this.app.use("/", indexRouter);
+    this.app.use("/users", usersRouter);
+  }
+
+  private initializeControllers(controllers: ControllerI[]) {
+    controllers.forEach((controller) => {
+      this.app.use(``, controller.router);
+    });
   }
 
   private errorHandler() {
@@ -62,4 +76,3 @@ class App {
 }
 
 export default new App().app;
-
