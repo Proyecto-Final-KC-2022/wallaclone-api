@@ -5,16 +5,9 @@ import { getServiceResponseBase } from "./base.service.utils";
 import { IAdvertisement } from '../models/Advertisement';
 
 /**
- * @param {Object} options
- * @param {String} options.document Documento del cliente
- * @param {String} options.brand Marca de la aplicación invocante
- * @param {String} options.site Aplicación invocante
- * @param {Array} options.ratesToKeep Listado de tipos de tarifa a evaluar
- * @param {LogsI} log app loger instance
- * @param {opentracing.Span} tracerSpanService span for service distrubuted logs trace
+ * @param {Filters} options
  * @return {Promise}
  */
-
 
 async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
   const serviceResponse: ResponseI<Array<IAdvertisement & { _id: any }>> = getServiceResponseBase();
@@ -72,7 +65,7 @@ async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdv
   return serviceResponse;
 }
 
-function setPriceFilter(price: string, filters: Filters) {
+function setPriceFilter(price: string, filters: Filters): void {
   const rangePriceRegex = /^\d+-\d+$/;
   const greaterThanPriceRegex = /^\d+-$/;
   const lessThanPriceRegex = /^-\d+$/;

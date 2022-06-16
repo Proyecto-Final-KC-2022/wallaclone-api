@@ -1,4 +1,6 @@
 import createError from "http-errors";
+import cors from 'cors';
+
 
 import express, { RequestHandler, ErrorRequestHandler } from "express";
 import path from "path";
@@ -32,6 +34,7 @@ class App {
     this.app.set("view engine", "jade");
 
     this.app.use(logger("dev"));
+    this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(cookieParser());
