@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const URL_DATABASE =
-  process.env.MONGODB_CONNSTR || "mongodb://localhost/nodepop";
+  process.env.MONGODB_CONNSTR || "mongodb://localhost/wallaclone";
 
 export class MongooseConnection {
   constructor() {
