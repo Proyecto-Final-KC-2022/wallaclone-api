@@ -1,4 +1,4 @@
-import ResponseI from "@/controllers/models/response.model";
+import ResponseI from "../controllers/models/response.model";
 
 export function getServiceResponseBase<T>(): ResponseI<T> {
   return {

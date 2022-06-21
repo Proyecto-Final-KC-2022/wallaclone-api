@@ -1,15 +1,13 @@
-import ResponseI from "@/controllers/models/response.model";
-import { Advertisement, Filters } from "@/models/Advertisement";
-import { IncomingHttpHeaders } from "http";
+import ResponseI from "../controllers/models/response.model";
+import { Advertisement, AdvertisementsFilters, IAdvertisement } from "@/models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
-import { IAdvertisement } from '../models/Advertisement';
 
 /**
- * @param {Filters} options
+ * @param {AdvertisementsFilters} options
  * @return {Promise}
  */
 
-async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
+async function getAdvertisements(options: AdvertisementsFilters): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
   const serviceResponse: ResponseI<Array<IAdvertisement & { _id: any }>> = getServiceResponseBase();
 
   // Implement your business logic here...
@@ -32,7 +30,7 @@ async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdv
   // });
 
   try {
-    const filters: Filters = {};
+    const filters: AdvertisementsFilters = {};
     const skip = Number(options.start);
     const sortBy = String(options.sort);
 
@@ -65,7 +63,7 @@ async function getAdvertisements(options: Filters): Promise<ResponseI<Array<IAdv
   return serviceResponse;
 }
 
-function setPriceFilter(price: string, filters: Filters): void {
+function setPriceFilter(price: string, filters: AdvertisementsFilters): void {
   const rangePriceRegex = /^\d+-\d+$/;
   const greaterThanPriceRegex = /^\d+-$/;
   const lessThanPriceRegex = /^-\d+$/;

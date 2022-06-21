@@ -2,7 +2,8 @@ import { MongooseConnection } from "./connectMongoose";
 import { Advertisement } from "./models/Advertisement";
 import * as readLine from "readline";
 import { ANUNCIOS } from "./anuncios";
-
+import { User } from "./models/User";
+import { Types } from "mongoose";
 
 main().catch((err) => console.error("Error!", err));
 
@@ -20,12 +21,34 @@ async function main() {
     console.log("DB init aborted! nothing has been done");
     return process.exit(0);
   }
-
-  // Inicializar nuestros modelos
-  const { deletedCount, loadedCount } = await initAnuncios(ANUNCIOS);
+  const { deletedUserCount, loadedUserCount } = await initUsers();
   console.log(
-    `\nAnuncios: Deleted ${deletedCount}, loaded ${loadedCount}`
+    `\nUsuarios: Deleted ${deletedUserCount}, loaded ${loadedUserCount}`
   );
+  for await (const [index, user] of (await User.find({})).entries()) {
+    console.log(user);
+    if (index === 0) {
+      const advert = await Advertisement.create({
+        ...ANUNCIOS[index],
+        owner: new Types.ObjectId(user.id),
+      });
+      console.log(`Anuncio insertado: ${advert}`); 
+    } else {
+      const nextAdverts = ANUNCIOS.splice(index, index + 1);
+      nextAdverts.forEach(async (nxtAd) => {
+        const advert = await Advertisement.create({
+          ...nxtAd,
+          owner: new Types.ObjectId(user.id),
+        }); 
+        console.log(`Anuncio insertado: ${advert}`);
+      });
+    }
+  }
+  // Comprobar que funciona al buscar anuncios por id de usuario
+  for await (const user of await User.find({})) {
+    const adverts = await Advertisement.listAdvertsByUser(user.id); 
+    console.log(`Anuncios: ${adverts} creados por usuario ${user.name}`);
+  }
 
   // Cuando termino, cierro la conexión a la BD
   await mongooseConnection.close();
@@ -33,28 +56,28 @@ async function main() {
   return process.exit(0);
 }
 
-async function initAnuncios(data: any) {
-  const { deletedCount } = await Advertisement.deleteMany();
-  const loadedCount = await Advertisement.loadMockedData(data);
-  return { deletedCount, loadedCount };
-}
-
-// async function initUsuarios() {
-//   const { deletedCount } = await Usuario.deleteMany();
-//   const loadedCount = await Usuario.insertMany([
-//     {
-//       name: "user",
-//       email: "user@example.com",
-//       password: Usuario.hashPassword("1234"),
-//     },
-//     {
-//       name: "user2",
-//       email: "user2@example.com",
-//       password: Usuario.hashPassword("1234"),
-//     },
-//   ]);
+// async function initAnuncios(data: any) {
+//   const { deletedCount } = await Advertisement.deleteMany();
+//   const loadedCount = await Advertisement.loadMockedData(data);
 //   return { deletedCount, loadedCount };
 // }
+
+async function initUsers() {
+  const { deletedCount: deletedUserCount } = await User.deleteMany();
+  const loadedUserCount = await User.insertMany([
+    {
+      name: "user1",
+      email: "user1@example.com",
+      password: await User.hashPassword("1234"),
+    },
+    {
+      name: "user2",
+      email: "user2@example.com",
+      password: await User.hashPassword("1234"),
+    },
+  ]);
+  return { deletedUserCount, loadedUserCount };
+}
 
 async function askUser(question: string): Promise<string> {
   return new Promise((resolve) => {
