@@ -2,7 +2,7 @@ import Controller from "./models/controller.model";
 import * as express from "express";
 import ResponseI from "./models/response.model";
 import * as advertisementsService from '../services/advertisements.service';
-import { IAdvertisement } from "@/models/Advertisement";
+import { IAdvertisement } from "../../models/Advertisement";
 
 export class Advertisements implements Controller {
   public router = express.Router();

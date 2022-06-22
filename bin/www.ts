@@ -6,12 +6,12 @@ import 'module-alias/register';
 import { config } from 'dotenv';
 config();
 
-import app from '@/app';
+import app from '../src/app';
 import Debug from 'debug';
 import http from 'http';
 
 const debug = Debug('wallaclone-api:server');
-import { bootstrapLogger } from '@/utils/loggers';
+import { bootstrapLogger } from '../src/utils/loggers';
 bootstrapLogger();
 
 /**

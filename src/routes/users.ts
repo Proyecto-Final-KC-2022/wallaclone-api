@@ -1,5 +1,5 @@
 import express from 'express';
-import { getLogger } from '@/utils/loggers';
+import { getLogger } from '../utils/loggers';
 const router = express.Router();
 const logger = getLogger('USER_ROUTE');
 

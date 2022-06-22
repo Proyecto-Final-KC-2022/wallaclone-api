@@ -25,12 +25,14 @@ async function main() {
   console.log(
     `\nUsuarios: Deleted ${deletedUserCount}, loaded ${loadedUserCount}`
   );
+    await Advertisement.deleteMany();
+
   for await (const [index, user] of (await User.find({})).entries()) {
     console.log(user);
     if (index === 0) {
       const advert = await Advertisement.create({
         ...ANUNCIOS[index],
-        owner: new Types.ObjectId(user.id),
+        owner: user.id,
       });
       console.log(`Anuncio insertado: ${advert}`); 
     } else {
@@ -38,7 +40,7 @@ async function main() {
       nextAdverts.forEach(async (nxtAd) => {
         const advert = await Advertisement.create({
           ...nxtAd,
-          owner: new Types.ObjectId(user.id),
+          owner: user.id,
         }); 
         console.log(`Anuncio insertado: ${advert}`);
       });

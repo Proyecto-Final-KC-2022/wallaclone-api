@@ -1,5 +1,5 @@
 import ResponseI from "../controllers/models/response.model";
-import { Advertisement, AdvertisementsFilters, IAdvertisement } from "@/models/Advertisement";
+import { Advertisement, AdvertisementsFilters, IAdvertisement } from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
 
 /**
