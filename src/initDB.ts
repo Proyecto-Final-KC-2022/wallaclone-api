@@ -1,9 +1,10 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import { MongooseConnection } from "./connectMongoose";
 import { Advertisement } from "./models/Advertisement";
 import * as readLine from "readline";
 import { ANUNCIOS } from "./anuncios";
 import { User } from "./models/User";
-import { Types } from "mongoose";
 
 main().catch((err) => console.error("Error!", err));
 

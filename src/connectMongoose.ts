@@ -5,6 +5,8 @@ const URL_DATABASE =
 
 export class MongooseConnection {
   constructor() {
+    console.log("CONFIG DE DOTENV " + process.env.MONGODB_CONNSTR);
+    
     this.listenToEvents();
   }
 
