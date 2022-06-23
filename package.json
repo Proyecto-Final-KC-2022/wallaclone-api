@@ -7,7 +7,7 @@
         "start": "node ./bin/www",
         "initdb": "node ./src/initDB",
         "initdb:dev": "nodemon --exec ts-node ./src/initDB.ts",
-        "build": "sh etc/build.sh"
+        "build": "sh etc/build.sh && cp .env ./dist"
     },
     "dependencies": {
         "@types/cors": "^2.8.12",
