@@ -1,6 +1,5 @@
 import createError from "http-errors";
-import cors from 'cors';
-
+import cors from "cors";
 
 import express, { RequestHandler, ErrorRequestHandler } from "express";
 import path from "path";
@@ -11,17 +10,18 @@ import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
 import ControllerI from "./routes//controllers/models/controller.model";
 import { Advertisements } from "./routes/controllers/advertisements.controller";
-import { MongooseConnection } from './connectMongoose';
+import { MongooseConnection } from "./connectMongoose";
+import { User } from "./routes/controllers/user.controller";
 
 //Meter todos los controllers en este array
-const appControllers: Array<ControllerI> = [new Advertisements()];
+const appControllers: Array<ControllerI> = [new Advertisements(), new User()];
 
 class App {
   public app: express.Application;
   public mongooseConnection = new MongooseConnection();
   constructor() {
     this.app = express();
-    this.mongooseConnection.connect()
+    this.mongooseConnection.connect();
     this.config();
     this.routerSetup();
     this.initializeControllers(appControllers);
