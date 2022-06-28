@@ -1,5 +1,9 @@
 import ResponseI from "../controllers/models/response.model";
-import { Advertisement, AdvertisementsFilters, IAdvertisement } from "../../models/Advertisement";
+import {
+  Advertisement,
+  AdvertisementsFilters,
+  IAdvertisement,
+} from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
 
 /**
@@ -7,8 +11,11 @@ import { getServiceResponseBase } from "./base.service.utils";
  * @return {Promise}
  */
 
-async function getAdvertisements(options: AdvertisementsFilters): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
-  const serviceResponse: ResponseI<Array<IAdvertisement & { _id: any }>> = getServiceResponseBase();
+async function getAdvertisements(
+  options: AdvertisementsFilters
+): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
+  const serviceResponse: ResponseI<Array<IAdvertisement & { _id: any }>> =
+    getServiceResponseBase();
 
   // Implement your business logic here...
   //
@@ -46,13 +53,9 @@ async function getAdvertisements(options: AdvertisementsFilters): Promise<Respon
     if (options.price) {
       setPriceFilter(options.price as string, filters);
     }
-    const advertisements: Array<IAdvertisement & { _id: any }>  = await Advertisement.list(
-      filters,
-      skip,
-      Number(options.limit),
-      sortBy
-    );
-    serviceResponse.data = advertisements; 
+    const advertisements: Array<IAdvertisement & { _id: any }> =
+      await Advertisement.list(filters, skip, Number(options.limit), sortBy);
+    serviceResponse.data = advertisements;
   } catch (error) {
     throw {
       status: 500, // Or another error code.
@@ -81,4 +84,47 @@ function setPriceFilter(price: string, filters: AdvertisementsFilters): void {
   }
 }
 
-export { getAdvertisements };
+async function geAdvertisementById(
+  id: string
+): Promise<ResponseI<IAdvertisement & { _id: any }>> {
+  const serviceResponse: ResponseI<IAdvertisement & { _id: any }> =
+    getServiceResponseBase();
+
+  try {
+    const advertisement = (await Advertisement.findById(
+      id
+    )) as IAdvertisement & { _id: any };
+    serviceResponse.data = advertisement;
+  } catch (error) {
+    throw {
+      status: 500, // Or another error code.
+      error: "Server Error", // Or another error message.
+    };
+  }
+
+  return serviceResponse;
+}
+
+async function deleteAdvertisements(
+  ids: Array<string>
+): Promise<ResponseI<IAdvertisement & { _id: any }>> {
+  const serviceResponse: ResponseI<any> =
+    getServiceResponseBase();
+
+  try {
+    const advertisementsDeleted = await Advertisement.deleteMany({
+      _id: { $in: ids },
+    });
+
+    serviceResponse.data = advertisementsDeleted;
+  } catch (error) {
+    throw {
+      status: 500, // Or another error code.
+      error: "Server Error", // Or another error message.
+    };
+  }
+
+  return serviceResponse;
+}
+
+export { getAdvertisements, geAdvertisementById, deleteAdvertisements };
