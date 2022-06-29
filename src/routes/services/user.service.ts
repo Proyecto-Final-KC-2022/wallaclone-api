@@ -110,4 +110,25 @@ async function getFavorites(
   return serviceResponse;
 }
 
-export { getUsers, getUserById, addFavorite, removeFavorite, getFavorites };
+
+async function deleteUser(
+  userId: string
+): Promise<ResponseI<any>> {
+  const serviceResponse: ResponseI<any> =
+    getServiceResponseBase();
+
+  try {
+    const advertisements: Array<IAdvertisement> = (await User.deleteOne({
+      _id: userId
+    })) as any;
+    serviceResponse.data = advertisements;
+  } catch (error) {
+    throw {
+      status: 500, // Or another error code.
+      error: "Server Error", // Or another error message.
+    };
+  }
+
+  return serviceResponse;
+}
+export { getUsers, getUserById, addFavorite, removeFavorite, getFavorites, deleteUser };

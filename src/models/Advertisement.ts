@@ -96,14 +96,16 @@ advertisementSchema.pre("deleteMany", async function (next: any) {
   try {
     const query = this as any;
     //https://mongoosejs.com/docs/tutorials/lean.html
-    let deletedAdverts = await Advertisement.find(query._conditions).lean();//lean hace que no instancie un documento completo de mongoose, si no que solo me devuelva el objeto plano de JS
+    let deletedAdverts = await Advertisement.find(query._conditions).lean(); //lean hace que no instancie un documento completo de mongoose, si no que solo me devuelva el objeto plano de JS
     deletedAdverts.forEach(async (advert) => {
       const usersWithAdAsFavorite = await User.find({
         favorites: { $all: [advert._id] },
-      });
-      usersWithAdAsFavorite.forEach(async (user) => {
-        await User.removeFavorite(user._id, advert._id);
-      });
+      }).lean();
+      if (usersWithAdAsFavorite && usersWithAdAsFavorite.length > 0) {
+        usersWithAdAsFavorite.forEach(async (user) => {
+          await User.removeFavorite(user._id, advert._id);
+        });
+      }
     });
     return next(); // normal save
   } catch (error) {

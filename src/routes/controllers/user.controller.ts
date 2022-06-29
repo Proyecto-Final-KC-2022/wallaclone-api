@@ -17,6 +17,7 @@ export class User implements Controller {
     this.router.put("/user/addFavorite", this.addFavorite);
     this.router.put("/user/removeFavorite", this.removeFavorite);
     this.router.get("/user/favorites/:id", this.getFavorites);
+    this.router.delete("/user/:id", this.deleteUser);
   }
 
   private getUsers = async (
@@ -123,5 +124,23 @@ export class User implements Controller {
     } catch (err) {
       next(err);
     }
+  };
+
+
+  private deleteUser = async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+  
+      try {
+        let controllerResponse: ResponseI<any>;
+        controllerResponse = await userService.deleteUser(req?.params?.id);
+        res
+          .status(controllerResponse.status || 200)
+          .json(controllerResponse.data);
+      } catch (err) {
+        next(err);
+      }
   };
 }

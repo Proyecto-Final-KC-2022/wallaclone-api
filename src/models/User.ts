@@ -111,4 +111,19 @@ userSchema.statics.listFavorites = async function (
   return result;
 };
 
+userSchema.pre("deleteOne", async function (next: any) {
+  try {
+    const query = this as any;
+    //https://mongoosejs.com/docs/tutorials/lean.html
+    const deletedUser = await User.findOne(query._conditions).lean(); //lean hace que no instancie un documento completo de mongoose, si no que solo me devuelva el objeto plano de JS
+    const advertisementsDeleted = await Advertisement.deleteMany({
+      owner: { $in: deletedUser?._id },
+    });
+    console.log(advertisementsDeleted);
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
+
 export const User = mongoose.model<IUser, IUserModel>("User", userSchema);
