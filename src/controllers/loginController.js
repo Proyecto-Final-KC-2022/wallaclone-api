@@ -2,7 +2,7 @@
 
 import { sign } from 'jsonwebtoken';
 
-import { Usuario } from '../models/User';
+import { User } from '../models/User';
 
 class LoginController {
   // login post desde API que retorna JWT
@@ -11,7 +11,7 @@ class LoginController {
       const { email, password } = req.body;
 
       // buscar el usuario en la BD
-      const usuario = await Usuario.findOne({ email });
+      const usuario = await User.findOne({ email });
 
       // si no lo encuentro o no coincide la contraseña --> error
       if (!usuario || !(await usuario.comparePassword(password))) {

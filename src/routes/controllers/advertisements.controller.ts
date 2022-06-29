@@ -3,6 +3,7 @@ import * as express from "express";
 import ResponseI from "./models/response.model";
 import * as advertisementsService from '../services/advertisements.service';
 import { IAdvertisement } from "../../models/Advertisement";
+import jwtAuth from "@/lib/jwtAuth";
 
 export class Advertisements implements Controller {
   public router = express.Router();
@@ -11,7 +12,9 @@ export class Advertisements implements Controller {
     this.initializeRoutes();
   }
   private initializeRoutes() {
-    this.router.get("/advertisements/", this.getAdvertisements);
+
+    // He protegido esta vista para hacer las pruebas de login. Pendiente borrar jwtAuth
+    this.router.get("/advertisements/", jwtAuth, this.getAdvertisements);
   }
 
   private getAdvertisements = async (
