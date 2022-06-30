@@ -5,7 +5,7 @@ import * as userService from '../services/user.service';
 import { IUser } from '../../models/User';
 import { IAdvertisement } from '../../models/Advertisement';
 
-import jwtToken from '../../lib/jwtAuth';
+import jwtToken from '../../libs/jwtToken'
 
 export class User implements Controller {
   public router = express.Router();
@@ -134,7 +134,11 @@ export class User implements Controller {
     res: express.Response,
     next: express.NextFunction
   ) => {
-    const { name, email, password } = req.body as { name: string; email: string; password: string };
+    const { name, email, password } = req.body as { 
+      name: string; 
+      email: string; 
+      password: string 
+    };
 
     if (!name || !email || !password) {
       res.status(400);
@@ -169,3 +173,5 @@ export class User implements Controller {
     }
   };
 }
+
+

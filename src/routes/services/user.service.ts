@@ -3,10 +3,10 @@ import { IAdvertisement } from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
 import { IUser, User } from "../../models/User";
 
-/**
- * @param {AdvertisementsFilters} options
- * @return {Promise}
- */
+
+ // @param {AdvertisementsFilters} options
+ // @return {Promise}
+ 
 
 async function getUsers(): Promise<ResponseI<Array<IUser & { _id: any }>>> {
   const serviceResponse: ResponseI<Array<IUser & { _id: any }>> =

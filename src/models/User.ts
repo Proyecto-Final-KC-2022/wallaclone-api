@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import * as bcrypt from "bcrypt";
-import { Advertisement, IAdvertisement } from './Advertisement';
+import { Advertisement, IAdvertisement } from "./Advertisement";
 
 //Tipo para los filtros que se podrán aplicar sobre los usuarios
 export type UserFilters = {
@@ -83,7 +83,7 @@ userSchema.statics.addAsFavorite = async function (
   advertId: string
 ): Promise<unknown> {
   const query = User.findByIdAndUpdate(userId, {
-    $addToSet : { favorites: [advertId] },
+    $addToSet: { favorites: [advertId] },
   });
 
   const result = await query.exec();
@@ -103,9 +103,11 @@ userSchema.statics.removeFavorite = async function (
 };
 
 userSchema.statics.listFavorites = async function (
-  userId: string,
+  userId: string
 ): Promise<unknown> {
-  const query = User.findById(userId).populate<{favorites: Array<IAdvertisement>}>('favorites').orFail();
+  const query = User.findById(userId)
+    .populate<{ favorites: Array<IAdvertisement> }>("favorites")
+    .orFail();
 
   const result = await query.exec();
   return result;
