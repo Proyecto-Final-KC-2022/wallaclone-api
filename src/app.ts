@@ -11,10 +11,9 @@ import usersRouter from "./routes/users";
 import ControllerI from "./routes//controllers/models/controller.model";
 import { Advertisements } from "./routes/controllers/advertisements.controller";
 import { MongooseConnection } from "./connectMongoose";
-//import { User } from "./routes/controllers/user.controller";
+import { User } from "./routes/controllers/user.controller";
 
-//Meter todos los controllers en este array
-//const appControllers: Array<ControllerI> = [new Advertisements(), new User()];
+const appControllers: Array<ControllerI> = [new Advertisements(), new User()];
 
 class App {
   public app: express.Application;
@@ -24,7 +23,7 @@ class App {
     this.mongooseConnection.connect();
     this.config();
     this.routerSetup();
-    //this.initializeControllers(appControllers);
+    this.initializeControllers(appControllers);
     this.errorHandler();
   }
 

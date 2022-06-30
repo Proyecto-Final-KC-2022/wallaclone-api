@@ -3,17 +3,17 @@ import { IAdvertisement } from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
 import { IUser, User } from "../../models/User";
 
-
- // @param {AdvertisementsFilters} options
- // @return {Promise}
- 
+/**
+ * @param {AdvertisementsFilters} options
+ * @return {Promise}
+ */
 
 async function getUsers(): Promise<ResponseI<Array<IUser & { _id: any }>>> {
   const serviceResponse: ResponseI<Array<IUser & { _id: any }>> =
     getServiceResponseBase();
 
   try {
-    const users: Array<IUser & { _id: any }> = await User.find();
+    const users: Array<IUser & { _id: any }> = await User.list();
     serviceResponse.data = users;
   } catch (error) {
     throw {
@@ -110,4 +110,51 @@ async function getFavorites(
   return serviceResponse;
 }
 
-export { getUsers, getUserById, addFavorite, removeFavorite, getFavorites };
+
+async function deleteUser(
+  userId: string
+): Promise<ResponseI<any>> {
+  const serviceResponse: ResponseI<any> =
+    getServiceResponseBase();
+
+  try {
+    const advertisements: Array<IAdvertisement> = (await User.deleteOne({
+      _id: userId
+    })) as any;
+    serviceResponse.data = advertisements;
+  } catch (error) {
+    throw {
+      status: 500, // Or another error code.
+      error: "Server Error", // Or another error message.
+    };
+  }
+
+  return serviceResponse;
+}
+
+async function registerUser(
+  name: string,
+  email: string,
+  password: string
+): Promise<any> {
+  const serviceResponse: ResponseI<IUser & { name: string, email: string, password: string}> =
+    getServiceResponseBase();
+
+  try {
+    await User.create({
+      name,
+      email,
+      password
+    })
+  } catch (error) {
+    throw {
+      status: 500,
+      error: "Server Error",
+    };
+  }
+
+  return serviceResponse;
+}
+
+
+export { getUsers, getUserById, addFavorite, removeFavorite, getFavorites, deleteUser, registerUser };

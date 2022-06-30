@@ -22,10 +22,10 @@ export interface IUser extends Document {
 interface IUserModel extends Model<IUser> {
   loadMockedData: (advertisements: Array<IUser>) => number;
   list: (
-    filters: UserFilters,
-    skip: number,
-    limit: number,
-    sortBy: string
+    filters?: UserFilters,
+    skip?: number,
+    limit?: number,
+    sortBy?: string
   ) => Promise<Array<IUser & { _id: any }>>;
   addAsFavorite: (userId: string, advertId: string) => Promise<unknown>;
   removeFavorite: (userId: string, advertId: string) => Promise<unknown>;
@@ -34,6 +34,7 @@ interface IUserModel extends Model<IUser> {
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
+  __v: { type: Number, select: false},
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -64,15 +65,25 @@ userSchema.statics.loadMockedData = async function (
 };
 
 userSchema.statics.list = async function (
-  filters: UserFilters,
-  skip: number,
-  limit: number,
-  sortBy: string
+  filters?: UserFilters,
+  skip?: number,
+  limit?: number,
+  sortBy?: string
 ): Promise<Array<IUser & { _id: any }>> {
-  const query = User.find(filters);
-  query.skip(skip);
-  query.limit(limit);
-  query.sort(sortBy);
+  const excludePasswordFromResult = { password: 0 };
+  const query = filters
+    ? User.find(filters, excludePasswordFromResult).lean()
+    : User.find({}, excludePasswordFromResult).lean();
+  if (typeof skip === "number") {
+    query.skip(skip);
+  }
+  if (typeof limit === "number") {
+    query.limit(limit);
+  }
+  if (sortBy) {
+    query.sort(sortBy);
+  }
+
   const result = await query.exec();
   return result;
 };
@@ -112,5 +123,20 @@ userSchema.statics.listFavorites = async function (
   const result = await query.exec();
   return result;
 };
+
+userSchema.pre("deleteOne", async function (next: any) {
+  try {
+    const query = this as any;
+    //https://mongoosejs.com/docs/tutorials/lean.html
+    const deletedUser = await User.findOne(query._conditions).lean(); //lean hace que no instancie un documento completo de mongoose, si no que solo me devuelva el objeto plano de JS
+    const advertisementsDeleted = await Advertisement.deleteMany({
+      owner: { $in: deletedUser?._id },
+    });
+    console.log(advertisementsDeleted);
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
 
 export const User = mongoose.model<IUser, IUserModel>("User", userSchema);
