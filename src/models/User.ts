@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import * as bcrypt from "bcrypt";
-import { Advertisement, IAdvertisement } from './Advertisement';
+import { Advertisement, IAdvertisement } from "./Advertisement";
 
 //Tipo para los filtros que se podrán aplicar sobre los usuarios
 export type UserFilters = {
@@ -22,10 +22,10 @@ export interface IUser extends Document {
 interface IUserModel extends Model<IUser> {
   loadMockedData: (advertisements: Array<IUser>) => number;
   list: (
-    filters: UserFilters,
-    skip: number,
-    limit: number,
-    sortBy: string
+    filters?: UserFilters,
+    skip?: number,
+    limit?: number,
+    sortBy?: string
   ) => Promise<Array<IUser & { _id: any }>>;
   addAsFavorite: (userId: string, advertId: string) => Promise<unknown>;
   removeFavorite: (userId: string, advertId: string) => Promise<unknown>;
@@ -34,6 +34,7 @@ interface IUserModel extends Model<IUser> {
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
+  __v: { type: Number, select: false},
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -64,15 +65,25 @@ userSchema.statics.loadMockedData = async function (
 };
 
 userSchema.statics.list = async function (
-  filters: UserFilters,
-  skip: number,
-  limit: number,
-  sortBy: string
+  filters?: UserFilters,
+  skip?: number,
+  limit?: number,
+  sortBy?: string
 ): Promise<Array<IUser & { _id: any }>> {
-  const query = User.find(filters);
-  query.skip(skip);
-  query.limit(limit);
-  query.sort(sortBy);
+  const excludePasswordFromResult = { password: 0 };
+  const query = filters
+    ? User.find(filters, excludePasswordFromResult).lean()
+    : User.find({}, excludePasswordFromResult).lean();
+  if (typeof skip === "number") {
+    query.skip(skip);
+  }
+  if (typeof limit === "number") {
+    query.limit(limit);
+  }
+  if (sortBy) {
+    query.sort(sortBy);
+  }
+
   const result = await query.exec();
   return result;
 };
@@ -83,7 +94,7 @@ userSchema.statics.addAsFavorite = async function (
   advertId: string
 ): Promise<unknown> {
   const query = User.findByIdAndUpdate(userId, {
-    $addToSet : { favorites: [advertId] },
+    $addToSet: { favorites: [advertId] },
   });
 
   const result = await query.exec();
@@ -103,9 +114,11 @@ userSchema.statics.removeFavorite = async function (
 };
 
 userSchema.statics.listFavorites = async function (
-  userId: string,
+  userId: string
 ): Promise<unknown> {
-  const query = User.findById(userId).populate<{favorites: Array<IAdvertisement>}>('favorites').orFail();
+  const query = User.findById(userId)
+    .populate<{ favorites: Array<IAdvertisement> }>("favorites")
+    .orFail();
 
   const result = await query.exec();
   return result;

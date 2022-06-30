@@ -13,7 +13,7 @@ async function getUsers(): Promise<ResponseI<Array<IUser & { _id: any }>>> {
     getServiceResponseBase();
 
   try {
-    const users: Array<IUser & { _id: any }> = await User.find();
+    const users: Array<IUser & { _id: any }> = await User.list();
     serviceResponse.data = users;
   } catch (error) {
     throw {
