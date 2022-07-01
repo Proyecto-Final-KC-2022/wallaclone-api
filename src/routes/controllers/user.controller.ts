@@ -4,11 +4,6 @@ import ResponseI from "./models/response.model";
 import * as userService from "../services/user.service";
 import { IUser } from "../../models/User";
 import { IAdvertisement } from "../../models/Advertisement";
-import {  User as UserMongoose} from "../../models/User";
-
-
-import { jwtToken } from "../../libs/jwtToken";
-
 export class User implements Controller {
   public router = express.Router();
 
@@ -148,49 +143,6 @@ export class User implements Controller {
       next(err);
     }
   };
-
-  /* private registerUser = async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    const { name, email, password } = req.body as {
-      name: string;
-      email: string;
-      password: string;
-    };
-
-    if (!name || !email || !password) {
-      res.status(400);
-      throw new Error("Please add all fields");
-    }
-
-    // Check if user exists
-    const userExists = await UserMongoose.findOne({ email });
-
-    if (userExists) {
-      res.status(400);
-      throw new Error("User already exists");
-    }
-
-    // Create user
-    const user = await UserMongoose.create({
-      name,
-      email,
-      password,
-    });
-
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      });
-    } else {
-      res.status(400);
-      throw new Error("Invalid user data");
-    }
-  }; */
 
   private registerUser = async (
     req: express.Request,

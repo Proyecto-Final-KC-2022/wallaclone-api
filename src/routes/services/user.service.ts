@@ -140,20 +140,49 @@ async function registerUser(
   const serviceResponse: ResponseI<IUser & { name: string, email: string, password: string}> =
     getServiceResponseBase();
 
-  try {
-    await User.create({
-      name,
-      email,
-      password
-    })
-  } catch (error) {
+  if (!name || !email || !password) {
     throw {
-      status: 500,
-      error: "Server Error",
+      status: 400,
+      error: "Please add all fields"
+    }
+  }
+
+  const userNameExists = await User.findOne({ name })
+
+  if (userNameExists) {
+    throw {
+      status: 401,
+      error: "Username already exists"
+    }
+  }
+
+  const emailExists = await User.findOne({ email })
+
+  if (emailExists) {
+    throw {
+      status: 403,
+      error: "Email already exists"
+    }
+  }
+
+  try {
+    const user: IUser & { name: string, email: string, password: string } = (await User.create({
+      name: name,
+      email: email,
+      password: password,
+    }))
+    user.password = await user.encrypPassword(user.password)
+    
+    serviceResponse.status = 200
+
+    } catch (error) {
+      throw {
+        status: 500,
+        error: "Server Error",
     };
   }
 
-  return serviceResponse;
+  return serviceResponse
 }
 
 

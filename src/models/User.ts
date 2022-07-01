@@ -15,6 +15,8 @@ export interface IUser extends Document {
   email: string;
   password: string; //Encriptada
   favorites: Array<Types.ObjectId>; //TODO: hacer la referencia al schema de user
+  encrypPassword(password: string): Promise<string>;
+  validatePassword(password: string): Promise<boolean>;
   comparePassword: (clearPassword: string) => Promise<string>;
 }
 
@@ -34,12 +36,26 @@ interface IUserModel extends Model<IUser> {
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
-  __v: { type: Number, select: false},
+  __v: { type: Number, select: false },
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
   favorites: { type: [Schema.Types.ObjectId], ref: "Advertisement" }, //TODO:
 });
+
+//encriptar contraseña
+userSchema.methods.encrypPassword = async (
+  password: string
+): Promise<string> => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+};
+
+userSchema.methods.validatePassword = async function (
+  password: string
+): Promise<boolean> {
+  return await bcrypt.compare(password, this.password);
+};
 
 //metodo estático
 userSchema.statics.hashPassword = function (
