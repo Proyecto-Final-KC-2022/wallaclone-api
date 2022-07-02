@@ -2,6 +2,8 @@ import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import * as bcrypt from "bcrypt";
 import { Advertisement, IAdvertisement } from "./Advertisement";
 import { ERROR_CODES, generateError } from "../utils/error.utils";
+const FIELDS_TO_EXCLUDE = { password: 0 };
+
 
 //Tipo para los filtros que se podrán aplicar sobre los usuarios
 export type UserFilters = {
@@ -16,7 +18,7 @@ export interface IUser extends Document {
   email: string;
   password: string; //Encriptada
   favorites: Array<Types.ObjectId>; //TODO: hacer la referencia al schema de user
-  comparePassword: (clearPassword: string) => Promise<string>;
+  validatePassword(password: string): Promise<boolean>;
 }
 
 //Interfaz para añadir los métodos estáticos
@@ -31,7 +33,7 @@ interface IUserModel extends Model<IUser> {
   addAsFavorite: (userId: string, advertId: string) => Promise<unknown>;
   removeFavorite: (userId: string, advertId: string) => Promise<unknown>;
   listFavorites: (userId: string) => Promise<unknown>;
-  hashPassword: (clearPassword: string) => Promise<string>;
+  encryptPassword: (password: string) => Promise<string>;
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
@@ -42,17 +44,18 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
   favorites: { type: [Schema.Types.ObjectId], ref: "Advertisement" }, //TODO:
 });
 
-//metodo estático
-userSchema.statics.hashPassword = function (
-  clearPassword: string
-): Promise<string> {
-  return bcrypt.hash(clearPassword, 7);
+//encriptar contraseña
+userSchema.statics.encryptPassword = async (
+  password: string
+): Promise<string> => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
 };
-//método de instancia
-userSchema.methods.comparePassword = function (
-  clearPassword: string
+
+userSchema.methods.validatePassword = async function (
+  password: string
 ): Promise<boolean> {
-  return bcrypt.compare(clearPassword, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
 userSchema.statics.loadMockedData = async function (
@@ -71,10 +74,9 @@ userSchema.statics.list = async function (
   limit?: number,
   sortBy?: string
 ): Promise<Array<IUser & { _id: any }>> {
-  const excludePasswordFromResult = { password: 0 };
   const query = filters
-    ? User.find(filters, excludePasswordFromResult).lean()
-    : User.find({}, excludePasswordFromResult).lean();
+    ? User.find(filters, FIELDS_TO_EXCLUDE).lean()
+    : User.find({}, FIELDS_TO_EXCLUDE).lean();
   if (typeof skip === "number") {
     query.skip(skip);
   }
@@ -111,7 +113,7 @@ userSchema.statics.removeFavorite = async function (
 ): Promise<unknown> {
   const query = User.findByIdAndUpdate(userId, {
     $pullAll: { favorites: [advertId] },
-  });
+  }).orFail(new Error(generateError(ERROR_CODES.BAD_REQUEST, "Invalid user provided", true) as string));
 
   const result = await query.exec();
   return result;
@@ -120,9 +122,9 @@ userSchema.statics.removeFavorite = async function (
 userSchema.statics.listFavorites = async function (
   userId: string
 ): Promise<unknown> {
-  const query = User.findById(userId)
+  const query = User.findById(userId, FIELDS_TO_EXCLUDE)
     .populate<{ favorites: Array<IAdvertisement> }>("favorites")
-    .orFail();
+    .orFail().lean();
 
   const result = await query.exec();
   return result;

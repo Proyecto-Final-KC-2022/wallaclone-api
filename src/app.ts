@@ -13,7 +13,6 @@ import { Advertisements } from "./routes/controllers/advertisements.controller";
 import { MongooseConnection } from "./connectMongoose";
 import { User } from "./routes/controllers/user.controller";
 
-//Meter todos los controllers en este array
 const appControllers: Array<ControllerI> = [new Advertisements(), new User()];
 
 class App {
@@ -43,7 +42,7 @@ class App {
 
   private routerSetup() {
     this.app.use("/", indexRouter);
-    this.app.use("/users", usersRouter);
+    this.app.use("/api/users", usersRouter);
   }
 
   private initializeControllers(controllers: ControllerI[]) {

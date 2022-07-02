@@ -71,12 +71,12 @@ async function initUsers() {
     {
       name: "user1",
       email: "user1@example.com",
-      password: await User.hashPassword("1234"),
+      password: await User.encryptPassword("1234"),
     },
     {
       name: "user2",
       email: "user2@example.com",
-      password: await User.hashPassword("1234"),
+      password: await User.encryptPassword("1234"),
     },
   ]);
   return { deletedUserCount, loadedUserCount };
