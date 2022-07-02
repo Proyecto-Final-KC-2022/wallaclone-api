@@ -81,4 +81,40 @@ function setPriceFilter(price: string, filters: AdvertisementsFilters): void {
   }
 }
 
-export { getAdvertisements };
+
+async function createAdvertisement(
+  name: string,
+  image: string,
+  description: string,
+  forSale: boolean,
+  price: number,
+  tags: any,
+  creationDate: string,
+  owner: any,
+  preOrdered: boolean,
+  sold: boolean
+): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
+  
+  const serviceResponse: any = getServiceResponseBase();
+
+  try {
+    const anuncio: any = new Advertisement;
+    
+    const advertisement: IAdvertisement & { _id: any } = (await anuncio.save(
+      name, image, description, forSale, price, tags, creationDate, owner, preOrdered, sold
+    )) as IAdvertisement & { _id: any };
+    
+    serviceResponse.data = advertisement;
+
+  } catch (error) {
+    throw {
+      status: 500, // Or another error code.
+      error: "Server Error", // Or another error message.
+    };
+  }
+
+  return serviceResponse;
+}
+
+
+export { getAdvertisements, createAdvertisement };

@@ -80,6 +80,8 @@ advertisementSchema.statics.list = async function (
   const result = await query.exec();
   return result;
 };
+
+
 export const Advertisement = mongoose.model<
   IAdvertisement,
   IAdvertisementModel

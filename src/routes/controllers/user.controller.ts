@@ -24,8 +24,6 @@ export class User implements Controller {
     res: express.Response,
     next: express.NextFunction
   ) => {
-    
-
     try {
       let controllerResponse: ResponseI<Array<IUser & { _id: any }>>;
 
