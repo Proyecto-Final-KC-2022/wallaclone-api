@@ -15,9 +15,7 @@ export interface IUser extends Document {
   email: string;
   password: string; //Encriptada
   favorites: Array<Types.ObjectId>; //TODO: hacer la referencia al schema de user
-  encrypPassword(password: string): Promise<string>;
   validatePassword(password: string): Promise<boolean>;
-  comparePassword: (clearPassword: string) => Promise<string>;
 }
 
 //Interfaz para añadir los métodos estáticos
@@ -32,7 +30,7 @@ interface IUserModel extends Model<IUser> {
   addAsFavorite: (userId: string, advertId: string) => Promise<unknown>;
   removeFavorite: (userId: string, advertId: string) => Promise<unknown>;
   listFavorites: (userId: string) => Promise<unknown>;
-  hashPassword: (clearPassword: string) => Promise<string>;
+  encryptPassword: (password: string) => Promise<string>;
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
@@ -44,7 +42,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
 });
 
 //encriptar contraseña
-userSchema.methods.encrypPassword = async (
+userSchema.statics.encryptPassword = async (
   password: string
 ): Promise<string> => {
   const salt = await bcrypt.genSalt(10);
@@ -55,19 +53,6 @@ userSchema.methods.validatePassword = async function (
   password: string
 ): Promise<boolean> {
   return await bcrypt.compare(password, this.password);
-};
-
-//metodo estático
-userSchema.statics.hashPassword = function (
-  clearPassword: string
-): Promise<string> {
-  return bcrypt.hash(clearPassword, 7);
-};
-//método de instancia
-userSchema.methods.comparePassword = function (
-  clearPassword: string
-): Promise<boolean> {
-  return bcrypt.compare(clearPassword, this.password);
 };
 
 userSchema.statics.loadMockedData = async function (

@@ -110,16 +110,12 @@ async function getFavorites(
   return serviceResponse;
 }
 
-
-async function deleteUser(
-  userId: string
-): Promise<ResponseI<any>> {
-  const serviceResponse: ResponseI<any> =
-    getServiceResponseBase();
+async function deleteUser(userId: string): Promise<ResponseI<any>> {
+  const serviceResponse: ResponseI<any> = getServiceResponseBase();
 
   try {
     const advertisements: Array<IAdvertisement> = (await User.deleteOne({
-      _id: userId
+      _id: userId,
     })) as any;
     serviceResponse.data = advertisements;
   } catch (error) {
@@ -137,53 +133,62 @@ async function registerUser(
   email: string,
   password: string
 ): Promise<any> {
-  const serviceResponse: ResponseI<IUser & { name: string, email: string, password: string}> =
-    getServiceResponseBase();
+  const serviceResponse: ResponseI<
+    | (IUser & {
+        _id: any;
+      })
+    | any
+  > = getServiceResponseBase();
 
   if (!name || !email || !password) {
-    throw {
+    serviceResponse.status = 400;
+    serviceResponse.data = {
       status: 400,
-      error: "Please add all fields"
-    }
+      message: "Please add all fields",
+    };
   }
 
-  const userNameExists = await User.findOne({ name })
-
+  const userNameExists = await User.findOne({ name });
+  const emailExists = await User.findOne({ email });
   if (userNameExists) {
-    throw {
+    serviceResponse.status = 401;
+    serviceResponse.data = {
       status: 401,
-      error: "Username already exists"
-    }
-  }
-
-  const emailExists = await User.findOne({ email })
-
-  if (emailExists) {
-    throw {
+      message: "Username already exists",
+    };
+  } else if (emailExists) {
+    serviceResponse.status = 403;
+    serviceResponse.data = {
       status: 403,
-      error: "Email already exists"
-    }
-  }
+      message: "Email already exists",
+    };
+  } else {
+    try {
+      await User.create({
+        name: name,
+        email: email,
+        password: await User.encryptPassword(password),
+      });
 
-  try {
-    const user: IUser & { name: string, email: string, password: string } = (await User.create({
-      name: name,
-      email: email,
-      password: password,
-    }))
-    user.password = await user.encrypPassword(user.password)
-    
-    serviceResponse.status = 200
-
+      serviceResponse.status = 201; //HTTP STATUS CREATED
+      serviceResponse.data = { message: "User created successfully" };
     } catch (error) {
       throw {
         status: 500,
         error: "Server Error",
-    };
+      };
+    }
   }
 
-  return serviceResponse
+  return serviceResponse;
 }
 
-
-export { getUsers, getUserById, addFavorite, removeFavorite, getFavorites, deleteUser, registerUser };
+export {
+  getUsers,
+  getUserById,
+  addFavorite,
+  removeFavorite,
+  getFavorites,
+  deleteUser,
+  registerUser,
+};
