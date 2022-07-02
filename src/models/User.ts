@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import * as bcrypt from "bcrypt";
 import { Advertisement, IAdvertisement } from "./Advertisement";
+import { ERROR_CODES, generateError } from "../utils/error.utils";
 
 //Tipo para los filtros que se podrán aplicar sobre los usuarios
 export type UserFilters = {
@@ -34,7 +35,7 @@ interface IUserModel extends Model<IUser> {
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
-  __v: { type: Number, select: false},
+  __v: { type: Number, select: false },
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -88,11 +89,14 @@ userSchema.statics.list = async function (
   return result;
 };
 
-//TODO: PROBAR SI FUNCIONA ESTO
 userSchema.statics.addAsFavorite = async function (
   userId: string,
   advertId: string
 ): Promise<unknown> {
+  const advertisementExists = await Advertisement.findById(advertId);
+  if(!advertisementExists){
+    throw new Error(generateError(ERROR_CODES.BAD_REQUEST, "User can only add advertisements as favorites", true) as string);
+  }
   const query = User.findByIdAndUpdate(userId, {
     $addToSet: { favorites: [advertId] },
   });

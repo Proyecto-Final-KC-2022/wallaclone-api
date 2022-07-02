@@ -4,6 +4,7 @@ import ResponseI from "./models/response.model";
 import * as userService from '../services/user.service';
 import { IUser } from '../../models/User';
 import { IAdvertisement } from '../../models/Advertisement';
+import { CustomError } from '../../utils/error.utils';
 
 export class User implements Controller {
   public router = express.Router();
@@ -114,7 +115,7 @@ export class User implements Controller {
   ) => {
 
     try {
-      let controllerResponse: ResponseI<Array<IAdvertisement>>;
+      let controllerResponse: ResponseI<Array<IAdvertisement> |  CustomError>;
 
       controllerResponse = await userService.getFavorites(req.params['id']?.toString());
 
