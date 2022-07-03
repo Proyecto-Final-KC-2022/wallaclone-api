@@ -62,11 +62,11 @@ export class User implements Controller {
     res: express.Response,
     next: express.NextFunction
   ) => {
+
     const options = {
       body: req.body as { userId: string; advertId: string;}
     };
     
-
     try {
       let controllerResponse: ResponseI<IUser & { _id: any }>;
 

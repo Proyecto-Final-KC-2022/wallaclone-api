@@ -88,6 +88,9 @@ export class Advertisements implements Controller {
         anuncio["body"].sold
       );
 
+      console.log('*********** controllerResponse ***********');
+      console.log(controllerResponse);
+
       res
         .status(controllerResponse.status || 201)
         .json(controllerResponse.data);
