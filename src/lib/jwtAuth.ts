@@ -12,8 +12,8 @@ const jwtAuth = (req, res, next) => {
   
   // comprobar que me han dado un token
   if (!jwtToken) {
-    const error = new Error('no token provided')
-    //error.status = 401
+    const error = {status: 401,
+    message: "No token provided"}
     next(error);
     return;
   }
@@ -21,8 +21,8 @@ const jwtAuth = (req, res, next) => {
   // comprobar que el token es válido
   jwt.verify(jwtToken, "secreto", (err: any, payload: { _id: any; }) => {
     if (err) {
-      const error = new Error('invalid token')
-      //error.status = 401;
+      const error =  {status: 401,
+        message: "Invalid token"}
       next(error);
       return;
     }
