@@ -2,7 +2,7 @@
 
 import { sign } from 'jsonwebtoken';
 
-import { User } from '../models/User';
+import { User } from '../../models/User';
 
 class LoginController {
   // login post desde API que retorna JWT
@@ -22,7 +22,7 @@ class LoginController {
       // generamos un JWT con su _id
       sign({ _id: usuario._id }, "secreto", {
         expiresIn: '2d'
-      }, (err, jwtToken) => {
+      }, (err: any, jwtToken: any) => {
         if (err) {
           next(err);
           return;

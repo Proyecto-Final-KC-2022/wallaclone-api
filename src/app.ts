@@ -16,8 +16,9 @@ import { User } from "./routes/controllers/user.controller";
 
 // Login Marce
 
-import LoginController from './controllers/loginController';
-import jwtAuth from './lib/jwtAuth';
+import LoginController from './routes/controllers/loginController';
+import jwtAuth from "./lib/jwtAuth";
+// import {jwtAuth} from './lib/jwtAuth';
 const loginController = new LoginController();
 
 
@@ -57,12 +58,11 @@ class App {
     // Login Marce 
 
     this.app.post('/api/login', loginController.postJWT)
-
   }
 
   private initializeControllers(controllers: ControllerI[]) {
     controllers.forEach((controller) => {
-      this.app.use(``, controller.router);
+      this.app.use(``, jwtAuth, controller.router);
     });
   }
 

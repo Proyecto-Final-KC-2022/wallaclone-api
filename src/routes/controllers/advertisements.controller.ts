@@ -14,7 +14,7 @@ export class Advertisements implements Controller {
   private initializeRoutes() {
 
     // He protegido esta vista para hacer las pruebas de login. Pendiente borrar jwtAuth
-    this.router.get("/advertisements/", jwtAuth, this.getAdvertisements);
+    this.router.get("/advertisements/", this.getAdvertisements);
   }
 
   private getAdvertisements = async (
