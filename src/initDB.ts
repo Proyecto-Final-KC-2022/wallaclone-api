@@ -78,6 +78,47 @@ async function initUsers() {
       email: "user2@example.com",
       password: await User.encryptPassword("1234"),
     },
+    {
+      name: "user3",
+      email: "user3@example.com",
+      password: await User.encryptPassword("1234"),
+    },
+    {
+      name: "user4",
+      email: "user4@example.com",
+      password: await User.encryptPassword("1234"),
+    },
+    {
+      name: "user5",
+      email: "user5@example.com",
+      password: await User.encryptPassword("1234"),
+    },
+    {
+      name: "user6",
+      email: "user6@example.com",
+      password: await User.encryptPassword("1234"),
+    },
+    {
+      name: "user7",
+      email: "user7@example.com",
+      password: await User.encryptPassword("1234"),
+    },{
+      name: "user8",
+      email: "user8@example.com",
+      password: await User.encryptPassword("1234"),
+    },{
+      name: "user9",
+      email: "user9@example.com",
+      password: await User.encryptPassword("1234"),
+    },{
+      name: "user10",
+      email: "user10@example.com",
+      password: await User.encryptPassword("1234"),
+    },{
+      name: "user11",
+      email: "user11@example.com",
+      password: await User.encryptPassword("1234"),
+    },
   ]);
   return { deletedUserCount, loadedUserCount };
 }
