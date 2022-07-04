@@ -113,11 +113,7 @@ export class Advertisements implements Controller {
           sold: boolean
         }
       }
-      console.log('*********** anuncio ***********');
-      console.log(anuncio);
-
-      //console.log('*********** req.body ***********');
-      //console.log(req.body);
+      
 
       let controllerResponse: any;
       controllerResponse = await advertisementsService.createAdvertisement(
