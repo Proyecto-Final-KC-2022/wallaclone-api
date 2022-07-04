@@ -1,4 +1,13 @@
-import mongoose, { Schema, Document, Model, Types, ObjectId } from "mongoose";
+import { NextFunction } from "express";
+import mongoose, {
+  Schema,
+  Document,
+  Model,
+  Types,
+  ObjectId,
+  Query,
+} from "mongoose";
+import { User } from "./User";
 //Tipo para los filtros que se podrán aplicar sobre los anuncios
 export type AdvertisementsFilters = {
   start?: string;
@@ -33,10 +42,13 @@ interface IAdvertisementModel extends Model<IAdvertisement> {
     limit: number,
     sortBy: string
   ) => Promise<Array<IAdvertisement & { _id: any }>>;
-  listAdvertsByUser: (userId: string) => Promise<Array<IAdvertisement & { _id: any }>>;
+  listAdvertsByUser: (
+    userId: string
+  ) => Promise<Array<IAdvertisement & { _id: any }>>;
 }
 
 const advertisementSchema: Schema<IAdvertisement> = new mongoose.Schema({
+  __v: { type: Number, select: false},
   name: { type: String, required: true },
   image: { type: String, required: true },
   description: { type: String, required: true },
@@ -62,7 +74,7 @@ advertisementSchema.statics.loadMockedData = async function (
 advertisementSchema.statics.listAdvertsByUser = async function (
   userId: string
 ): Promise<Array<IAdvertisement & { _id: any }>> {
-  const query = Advertisement.find({ owner: userId }); 
+  const query = Advertisement.find({ owner: userId });
   const result = await query.exec();
   return result;
 };
@@ -81,6 +93,26 @@ advertisementSchema.statics.list = async function (
   return result;
 };
 
+advertisementSchema.pre("deleteMany", async function (next: any) {
+  try {
+    const query = this as any;
+    //https://mongoosejs.com/docs/tutorials/lean.html
+    let deletedAdverts = await Advertisement.find(query._conditions).lean(); //lean hace que no instancie un documento completo de mongoose, si no que solo me devuelva el objeto plano de JS
+    deletedAdverts.forEach(async (advert) => {
+      const usersWithAdAsFavorite = await User.find({
+        favorites: { $all: [advert._id] },
+      }).lean();
+      if (usersWithAdAsFavorite && usersWithAdAsFavorite.length > 0) {
+        usersWithAdAsFavorite.forEach(async (user) => {
+          await User.removeFavorite(user._id, advert._id);
+        });
+      }
+    });
+    return next(); // normal save
+  } catch (error) {
+    return next(error);
+  }
+});
 
 export const Advertisement = mongoose.model<
   IAdvertisement,
