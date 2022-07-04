@@ -7,7 +7,7 @@ const jwtAuth = (req, res, next) => {
   // recoger el jwtToken de la cabecera, o de la query-string, o del body
 
   const authHeader = req.get('Authorization') 
-  const jwtToken = authHeader.replace('Bearer ', '') || req.query.token || req.body.token;
+  const jwtToken = authHeader?.replace('Bearer ', '') || req.query.token || req.body.token;
   
   
   // comprobar que me han dado un token
