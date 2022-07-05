@@ -2,7 +2,7 @@
 
 import { sign } from 'jsonwebtoken';
 
-import { User } from '../../models/User';
+import { User } from '../../../models/User';
 
 class LoginController {
   // login post desde API que retorna JWT

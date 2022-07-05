@@ -8,23 +8,24 @@ import logger from "morgan";
 
 import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
-import ControllerI from "./routes//controllers/models/controller.model";
-import { Advertisements } from "./routes/controllers/advertisements.controller";
 import { MongooseConnection } from "./connectMongoose";
-import { User } from "./routes/controllers/user.controller";
-
-
-// Login Marce
-
-import LoginController from './routes/controllers/loginController';
+import ControllerI from "./routes//controllers/models/controller.model";
+//Rutas privadas
+import { Advertisements as AdvertisementsPrivate } from "./routes/controllers/private_routes/advertisements.controller";
+import { User as UsersPrivate} from "./routes/controllers/private_routes/user.controller";
+//Rutas publicas
+import LoginController from './routes/controllers/public_routes/loginController';
+import { Advertisements as AdvertisementsPublic } from "./routes/controllers/public_routes/advertisements.controller";
+import { User as UsersPublic} from "./routes/controllers/public_routes/user.controller";
 import jwtAuth from "./lib/jwtAuth";
 // import {jwtAuth} from './lib/jwtAuth';
 const loginController = new LoginController();
 
+//Controllers con endpoints de acceso private
+const appPrivateControllers: Array<ControllerI> = [new AdvertisementsPrivate(), new UsersPrivate()];
+//Controllers con endpoints de acceso publico
+const appPublicControllers: Array<ControllerI> = [new AdvertisementsPublic(), new UsersPublic()];
 
-
-//Meter todos los controllers en este array
-const appControllers: Array<ControllerI> = [new Advertisements(), new User()];
 
 class App {
   public app: express.Application;
@@ -34,7 +35,8 @@ class App {
     this.mongooseConnection.connect();
     this.config();
     this.routerSetup();
-    this.initializeControllers(appControllers);
+    this.initializePublicControllers(appPublicControllers);
+    this.initializePrivateControllers(appPrivateControllers);
     this.errorHandler();
   }
 
@@ -52,17 +54,19 @@ class App {
   }
 
   private routerSetup() {
-    this.app.use("/", indexRouter);
-    this.app.use("/users", usersRouter);
-
     // Login Marce 
-
     this.app.post('/api/login', loginController.postJWT)
   }
 
-  private initializeControllers(controllers: ControllerI[]) {
+  private initializePrivateControllers(controllers: ControllerI[]) {
     controllers.forEach((controller) => {
       this.app.use(``, jwtAuth, controller.router);
+    });
+  }
+
+  private initializePublicControllers(controllers: ControllerI[]) {
+    controllers.forEach((controller) => {
+      this.app.use(``, controller.router);
     });
   }
 
