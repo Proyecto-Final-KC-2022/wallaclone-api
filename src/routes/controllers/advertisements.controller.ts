@@ -5,6 +5,10 @@ import * as advertisementsService from "../services/advertisements.service";
 import { IAdvertisement } from "../../models/Advertisement";
 import jwtAuth from "@/lib/jwtAuth";
 
+
+import {upload} from '../services/imageUpload';
+
+
 export class Advertisements implements Controller {
   public router = express.Router();
 
@@ -19,7 +23,7 @@ export class Advertisements implements Controller {
     // this.router.post("/advertisements", this.createAdvertisement);
     // this.router.put("/advertisements", this.modifyAdvertisement);
     this.router.delete("/advertisements", this.deleteAdvertisements);
-    this.router.post('/advert', this.createAdvertisement);
+    this.router.post('/advert', upload.single('image'), this.createAdvertisement);
   }
 
   private getAdvertisements = async (
@@ -135,6 +139,7 @@ export class Advertisements implements Controller {
       res
         .status(controllerResponse.status || 201)
         .json(controllerResponse.data);
+        
     } catch (err) {
       next(err);
     }

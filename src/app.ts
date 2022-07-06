@@ -46,7 +46,7 @@ class App {
     this.app.use(logger("dev"));
     this.app.use(cors());
     this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: true, limit:"30" }));
+    this.app.use(express.urlencoded({ extended: true}));
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, "public")));
   }
