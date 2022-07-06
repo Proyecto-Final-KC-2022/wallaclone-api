@@ -30,8 +30,15 @@ async function getAdvertisements(
 
   try {
     const filters: AdvertisementsFilters = {};
-    const skip = Number(options.start);
-    const sortBy = String(options.sort);
+    if (options.start) {
+      filters.start = options.start;
+    }
+    if (options.sort) {
+      filters.sort = String(options.sort);
+    }
+    if (options.limit) {
+      filters.limit = options.limit;
+    }
 
     if (options.tags) {
       filters["tags"] = options.tags;
@@ -46,7 +53,7 @@ async function getAdvertisements(
       setPriceFilter(options.price as string, filters);
     }
     const advertisements: Array<IAdvertisement & { _id: any }> =
-      await Advertisement.list(filters, skip, Number(options.limit), sortBy);
+      await Advertisement.list(filters);
     serviceResponse.data = advertisements;
   } catch (error) {
     const customError = buildCustomError(error);
@@ -69,7 +76,7 @@ async function geAdvertisementById(
     )) as IAdvertisement & { _id: any };
 
     if (advertisement) {
-      serviceResponse.data =advertisement;
+      serviceResponse.data = advertisement;
     } else {
       serviceResponse.data = ADVERT_NOT_FOUND_ERROR;
       serviceResponse.status = ADVERT_NOT_FOUND_ERROR.status || 500;

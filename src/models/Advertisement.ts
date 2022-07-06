@@ -37,10 +37,7 @@ export interface IAdvertisement extends Document {
 interface IAdvertisementModel extends Model<IAdvertisement> {
   loadMockedData: (advertisements: Array<IAdvertisement>) => number;
   list: (
-    filters: AdvertisementsFilters,
-    skip: number,
-    limit: number,
-    sortBy: string
+    filters: AdvertisementsFilters
   ) => Promise<Array<IAdvertisement & { _id: any }>>;
   listAdvertsByUser: (
     userId: string
@@ -48,7 +45,7 @@ interface IAdvertisementModel extends Model<IAdvertisement> {
 }
 
 const advertisementSchema: Schema<IAdvertisement> = new mongoose.Schema({
-  __v: { type: Number, select: false},
+  __v: { type: Number, select: false },
   name: { type: String, required: true },
   image: { type: String, required: true },
   description: { type: String, required: true },
@@ -80,15 +77,18 @@ advertisementSchema.statics.listAdvertsByUser = async function (
 };
 
 advertisementSchema.statics.list = async function (
-  filters: AdvertisementsFilters,
-  skip: number,
-  limit: number,
-  sortBy: string
+  filters?: AdvertisementsFilters
 ): Promise<Array<IAdvertisement & { _id: any }>> {
   const query = Advertisement.find(filters);
-  query.skip(skip);
-  query.limit(limit);
-  query.sort(sortBy);
+  if (filters.start) {
+    query.skip(Number(filters.start));
+  }
+  if (filters.limit) {
+    query.limit(Number(filters.limit));
+  }
+  if (filters.sort) {
+    query.sort(filters.sort);
+  }
   const result = await query.exec();
   return result;
 };
