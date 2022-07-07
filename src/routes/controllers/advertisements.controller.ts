@@ -5,8 +5,8 @@ import * as advertisementsService from "../services/advertisements.service";
 import { IAdvertisement } from "../../models/Advertisement";
 import jwtAuth from "@/lib/jwtAuth";
 
-import {upload} from '../services/imageUploadLocal';
-//import {upload} from '../services/imageUploadS3';
+//import {upload} from '../services/imageUploadLocal';
+import {upload} from '../services/imageUploadS3';
 
 
 export class Advertisements implements Controller {
@@ -103,6 +103,7 @@ export class Advertisements implements Controller {
     try {
       console.log('*********** req.body ***********');
       console.log(req.body);
+      console.log(req.file);
 
       const anuncio = {
         body: req.body as { 
@@ -123,7 +124,7 @@ export class Advertisements implements Controller {
       let controllerResponse: any;
       controllerResponse = await advertisementsService.createAdvertisement(
         anuncio["body"].name,
-        req.file.filename,
+        req.file["location"],
         anuncio["body"].description,
         anuncio["body"].forSale,
         anuncio["body"].price,

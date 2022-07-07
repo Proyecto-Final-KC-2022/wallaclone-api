@@ -8,7 +8,7 @@ const s3: any = new aws.S3({
   region: process.env.S3AWS_REGION,
 });
 
-/*
+
 const fileFilter = (
   req: any,
   file: { mimetype: string },
@@ -20,10 +20,10 @@ const fileFilter = (
     cb(new Error('Invalid file type, only JPEG and PNG is allowed!'), false);
   }
 };
-*/
+
 
 const upload = multer({
-  //fileFilter,
+  fileFilter,
   storage: multerS3({
     acl: 'public-read',
     s3: s3,
@@ -33,7 +33,7 @@ const upload = multer({
       file: any,
       cb: (arg0: any, arg1: { image: string }) => void,
     ) {
-      cb(null, { image: file.fieldname });
+      cb(null, { image: 'TESTING_METADATA' });
     },
     key: function (req: any, file: any, cb: (arg0: any, arg1: string) => void) {
       cb(null, new Date(Date.now()).toISOString() + '_' + file.originalname);
