@@ -23,6 +23,7 @@ const fileFilter = (
 */
 
 const upload = multer({
+  //fileFilter,
   storage: multerS3({
     acl: 'public-read',
     s3: s3,
@@ -35,7 +36,7 @@ const upload = multer({
       cb(null, { image: file.fieldname });
     },
     key: function (req: any, file: any, cb: (arg0: any, arg1: string) => void) {
-      cb(null, Date.now().toString() + '.' + file.originalname);
+      cb(null, new Date(Date.now()).toISOString() + '_' + file.originalname);
     },
   }),
 });

@@ -5,8 +5,8 @@ import * as advertisementsService from "../services/advertisements.service";
 import { IAdvertisement } from "../../models/Advertisement";
 import jwtAuth from "@/lib/jwtAuth";
 
-//import {upload} from '../services/imageUploadLocal';
-import {upload} from '../services/imageUploadS3';
+import {upload} from '../services/imageUploadLocal';
+//import {upload} from '../services/imageUploadS3';
 
 
 export class Advertisements implements Controller {
