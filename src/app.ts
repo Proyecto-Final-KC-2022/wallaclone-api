@@ -2,6 +2,7 @@ import createError from "http-errors";
 import cors from "cors";
 
 import express, { RequestHandler, ErrorRequestHandler } from "express";
+import bodyParser from "body-parser";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -47,6 +48,7 @@ class App {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true}));
+    this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(cookieParser());
     this.app.use(express.static(path.join(__dirname, "public")));
   }

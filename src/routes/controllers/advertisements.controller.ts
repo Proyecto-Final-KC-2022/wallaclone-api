@@ -5,8 +5,8 @@ import * as advertisementsService from "../services/advertisements.service";
 import { IAdvertisement } from "../../models/Advertisement";
 import jwtAuth from "@/lib/jwtAuth";
 
-
-import {upload} from '../services/imageUpload';
+import {upload} from '../services/imageUploadLocal';
+//import {upload} from '../services/imageUploadS3';
 
 
 export class Advertisements implements Controller {
@@ -23,6 +23,7 @@ export class Advertisements implements Controller {
     // this.router.post("/advertisements", this.createAdvertisement);
     // this.router.put("/advertisements", this.modifyAdvertisement);
     this.router.delete("/advertisements", this.deleteAdvertisements);
+    //this.router.post('/advert', upload.single('image'), this.createAdvertisement);
     this.router.post('/advert', upload.single('image'), this.createAdvertisement);
   }
 
