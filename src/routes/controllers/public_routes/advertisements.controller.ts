@@ -3,7 +3,6 @@ import * as express from "express";
 import ResponseI from ".././models/response.model";
 import * as advertisementsService from "../../services/advertisements.service";
 import { IAdvertisement } from "../../../models/Advertisement";
-import jwtAuth from "@/lib/jwtAuth";
 
 export class Advertisements implements Controller {
   public router = express.Router();
@@ -19,8 +18,8 @@ export class Advertisements implements Controller {
   private getAdvertisements = async (
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
-  ) => {
+    next: express.NextFunction,
+  ) => {    
     const options = {
       start: req.query["start"]?.toString(),
       limit: req.query["limit"]?.toString(),
@@ -30,15 +29,12 @@ export class Advertisements implements Controller {
       price: req.query["price"]?.toString(),
       name: req.query["name"]?.toString(),
     };
-    // const foo= {
-    //     bar: 'bar'
-    // }
 
     try {
       let controllerResponse: ResponseI<Array<IAdvertisement & { _id: any }>>;
 
       controllerResponse = await advertisementsService.getAdvertisements(
-        options
+        options,
       );
 
       res

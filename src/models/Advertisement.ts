@@ -27,7 +27,7 @@ export interface IAdvertisement extends Document {
   forSale: boolean;
   price: number;
   tags: Types.Array<string>;
-  creationDate: string;
+  creationDate: Date;
   owner: Types.ObjectId;
   preOrdered: boolean;
   sold: boolean;
@@ -47,15 +47,15 @@ interface IAdvertisementModel extends Model<IAdvertisement> {
 const advertisementSchema: Schema<IAdvertisement> = new mongoose.Schema({
   __v: { type: Number, select: false },
   name: { type: String, required: true },
-  image: { type: String, required: true },
+  image: { type: String },
   description: { type: String, required: true },
   forSale: { type: Boolean, required: true },
   price: { type: Number, required: true },
-  tags: { type: [String], index: true },
-  creationDate: { type: String },
+  tags: { type: [String] },
+  creationDate: { type: Date },
   owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  preOrdered: { type: Boolean, required: true },
-  sold: { type: Boolean, required: true },
+  preOrdered: { type: Boolean },
+  sold: { type: Boolean },
 });
 
 advertisementSchema.statics.loadMockedData = async function (
@@ -79,7 +79,7 @@ advertisementSchema.statics.listAdvertsByUser = async function (
 advertisementSchema.statics.list = async function (
   filters?: AdvertisementsFilters
 ): Promise<Array<IAdvertisement & { _id: any }>> {
-  const query = Advertisement.find(filters);
+  const query = Advertisement.find(filters).sort({ creationDate: -1 });
   if (filters.start) {
     query.skip(Number(filters.start));
   }

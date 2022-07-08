@@ -25,10 +25,10 @@ export class User implements Controller {
     res: express.Response,
     next: express.NextFunction
   ) => {
+
     const options = {
       body: req.body as any,
     };
-
     try {
       let controllerResponse: any;
 
