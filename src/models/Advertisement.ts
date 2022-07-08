@@ -79,14 +79,15 @@ advertisementSchema.statics.listAdvertsByUser = async function (
 advertisementSchema.statics.list = async function (
   filters?: AdvertisementsFilters
 ): Promise<Array<IAdvertisement & { _id: any }>> {
-  const query = Advertisement.find(filters).sort({ creationDate: -1 });
-  if (filters.start) {
+  const {start, limit, sort, ...queryFilters} = filters;
+  const query = Advertisement.find(queryFilters).sort({ creationDate: -1 , _id: -1});
+  if (start) {
     query.skip(Number(filters.start));
   }
-  if (filters.limit) {
+  if (limit) {
     query.limit(Number(filters.limit));
   }
-  if (filters.sort) {
+  if (sort) {
     query.sort(filters.sort);
   }
   const result = await query.exec();
