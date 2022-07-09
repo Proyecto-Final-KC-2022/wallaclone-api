@@ -52,6 +52,7 @@ export class Advertisements implements Controller {
     try {
       console.log("*********** req.body ***********");
       console.log(req.body);
+      console.log("*********** req.file ***********");
       console.log(req.file);
 
       const anuncio = {

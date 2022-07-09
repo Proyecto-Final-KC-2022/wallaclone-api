@@ -31,9 +31,9 @@ const upload = multer({
     metadata: function (
       req: any,
       file: any,
-      cb: (arg0: any, arg1: { image: string }) => void,
+      cb: (arg0: any, arg1: { fieldName: string }) => void,
     ) {
-      cb(null, { image: 'TESTING_METADATA' });
+      cb(null, { fieldName: file.fieldname });
     },
     key: function (req: any, file: any, cb: (arg0: any, arg1: string) => void) {
       cb(null, new Date(Date.now()).toISOString() + '_' + file.originalname);
