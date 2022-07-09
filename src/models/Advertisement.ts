@@ -13,7 +13,7 @@ export type AdvertisementsFilters = {
   start?: string;
   limit?: string;
   sort?: string;
-  tags?: string;
+  tags?: any;
   forSale?: string;
   price?: string | { $gte?: string; $lte?: string };
   name?: string | RegExp;

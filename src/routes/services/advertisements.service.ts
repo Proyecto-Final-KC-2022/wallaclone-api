@@ -1,23 +1,20 @@
-import ResponseI from '../controllers/models/response.model';
+import ResponseI from "../controllers/models/response.model";
 import {
   Advertisement,
   AdvertisementsFilters,
   IAdvertisement,
-} from '../../models/Advertisement';
-import { getServiceResponseBase } from './base.service.utils';
+} from "../../models/Advertisement";
+import { getServiceResponseBase } from "./base.service.utils";
 import {
   buildCustomError,
   CustomError,
   ERROR_CODES,
   generateError,
-} from '../../utils/error.utils';
-
-
-
+} from "../../utils/error.utils";
 
 const ADVERT_NOT_FOUND_ERROR = generateError(
   ERROR_CODES.NOT_FOUND,
-  'Advertisement not found in database',
+  "Advertisement not found in database"
 ) as CustomError;
 
 /**
@@ -26,7 +23,7 @@ const ADVERT_NOT_FOUND_ERROR = generateError(
  */
 
 async function getAdvertisements(
-  options: AdvertisementsFilters,
+  options: AdvertisementsFilters
 ): Promise<ResponseI<Array<IAdvertisement & { _id: any }>> | any> {
   const serviceResponse: ResponseI<Array<IAdvertisement & { _id: any }> | any> =
     getServiceResponseBase();
@@ -43,14 +40,14 @@ async function getAdvertisements(
       filters.limit = options.limit;
     }
 
-    if (options.tags) {
-      filters['tags'] = options.tags;
+    if (options.tags?.length > 0) {
+      filters["tags"] = { $all: options.tags };
     }
     if (options.forSale) {
       filters.forSale = options.forSale;
     }
     if (options.name) {
-      filters.name = new RegExp(`^${filters.name}`, 'i');
+      filters.name = new RegExp(`^${filters.name}`, "i");
     }
     if (options.price) {
       setPriceFilter(options.price as string, filters);
@@ -68,14 +65,14 @@ async function getAdvertisements(
 }
 
 async function geAdvertisementById(
-  id: string,
+  id: string
 ): Promise<ResponseI<IAdvertisement & { _id: any }> | any> {
   const serviceResponse: ResponseI<(IAdvertisement & { _id: any }) | any> =
     getServiceResponseBase();
 
   try {
     const advertisement = (await Advertisement.findById(
-      id,
+      id
     )) as IAdvertisement & { _id: any };
 
     if (advertisement) {
@@ -94,7 +91,7 @@ async function geAdvertisementById(
 }
 
 async function deleteAdvertisements(
-  ids: Array<string>,
+  ids: Array<string>
 ): Promise<ResponseI<IAdvertisement & { _id: any }>> {
   const serviceResponse: ResponseI<any> = getServiceResponseBase();
 
@@ -113,7 +110,7 @@ async function deleteAdvertisements(
     } else {
       const customError = generateError(
         ERROR_CODES.BAD_REQUEST,
-        'No valid advertisements to delete were provided',
+        "No valid advertisements to delete were provided"
       ) as CustomError;
       serviceResponse.data = customError;
       serviceResponse.status = customError.status || 500;
@@ -158,7 +155,7 @@ async function createAdvertisement(
   creationDate: string = new Date(Date.now()).toISOString(),
   owner: any,
   preOrdered: boolean = false,
-  sold: boolean = false,
+  sold: boolean = false
 ): Promise<ResponseI<Array<IAdvertisement & { _id: any }>>> {
   const serviceResponse: any = getServiceResponseBase();
 
@@ -181,7 +178,7 @@ async function createAdvertisement(
   } catch (error) {
     throw {
       status: 500, // Or another error code.
-      error: 'Server Error', // Or another error message.
+      error: "Server Error", // Or another error message.
     };
   }
   return serviceResponse;
@@ -193,13 +190,13 @@ function setPriceFilter(price: string, filters: AdvertisementsFilters): void {
   const lessThanPriceRegex = /^-\d+$/;
   const onlyPriceNumberRegex = /^\d+$/;
   if (rangePriceRegex.test(price)) {
-    const gteValue = price.split('-')[0];
-    const lteValue = price.split('-')[1];
+    const gteValue = price.split("-")[0];
+    const lteValue = price.split("-")[1];
     filters.price = { $gte: gteValue, $lte: lteValue };
   } else if (greaterThanPriceRegex.test(price)) {
-    filters.price = { $gte: price.replace('-', '') };
+    filters.price = { $gte: price.replace("-", "") };
   } else if (lessThanPriceRegex.test(price)) {
-    filters.price = { $lte: price.replace('-', '') };
+    filters.price = { $lte: price.replace("-", "") };
   } else if (onlyPriceNumberRegex.test(price)) {
     filters.price = price;
   }
