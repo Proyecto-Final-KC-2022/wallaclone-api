@@ -47,7 +47,7 @@ async function getAdvertisements(
       filters.forSale = options.forSale;
     }
     if (options.name) {
-      filters.name = new RegExp(`^${filters.name}`, "i");
+      filters.name = new RegExp(`^${options.name}`, "i");
     }
     if (options.price) {
       setPriceFilter(options.price as string, filters);
