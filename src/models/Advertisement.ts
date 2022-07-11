@@ -11,6 +11,7 @@ import { User } from "./User";
 //Tipo para los filtros que se podrán aplicar sobre los anuncios
 export type AdvertisementsFilters = {
   start?: string;
+  owner?: string;
   limit?: string;
   sort?: string;
   tags?: any;

@@ -30,6 +30,9 @@ async function getAdvertisements(
 
   try {
     const filters: AdvertisementsFilters = {};
+    if (options.owner) {
+      filters.owner = options.owner;
+    }
     if (options.start) {
       filters.start = options.start;
     }

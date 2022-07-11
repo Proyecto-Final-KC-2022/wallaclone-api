@@ -4,6 +4,8 @@ import ResponseI from ".././models/response.model";
 import * as advertisementsService from "../../services/advertisements.service";
 import { IAdvertisement } from "../../../models/Advertisement";
 import { upload } from "../../services/imageUploadS3";
+import { CustomError } from "../../../utils/error.utils";
+import { decodeToken } from "../../../utils/tokenDecoder";
 
 export class Advertisements implements Controller {
   public router = express.Router();
@@ -20,6 +22,7 @@ export class Advertisements implements Controller {
       this.createAdvertisement
     );
     this.router.delete("/advertisements", this.deleteAdvertisements);
+    this.router.get("/getAdvertisementsByUser", this.getAdvertisementsByUser);
   }
 
   private deleteAdvertisements = async (
@@ -89,6 +92,26 @@ export class Advertisements implements Controller {
 
       res
         .status(controllerResponse.status || 201)
+        .json(controllerResponse.data);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  private getAdvertisementsByUser = async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    try {
+      const { _id: userId } = decodeToken(req?.headers?.authorization);
+      let controllerResponse: ResponseI<Array<IAdvertisement> | CustomError>;
+      controllerResponse = await advertisementsService.getAdvertisements({
+        owner: userId,
+      });
+
+      res
+        .status(controllerResponse.status || 200)
         .json(controllerResponse.data);
     } catch (err) {
       next(err);
