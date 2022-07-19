@@ -7,13 +7,29 @@ class SocketService {
   constructor() {}
 
   startServerListener(server) {
-    this.io = new Server(server, {});
+    this.io = new Server(server, {
+      cors: {
+        origin: process.env.SOCKET_CLIENT,
+      },
+    });
     this.io.on("connection", (socket: Socket) => {
       console.log("Socket connected and listening on server...");
+      console.log(
+        `Numero de clientes conectados ==>>`,
+        this.io.engine.clientsCount
+      );
       /* Recepcion del evento login para añadir el usuario a la */
-      socket.on("login", async (data) => {
-        socket.join(data.userId);
+      socket.on("login", async (data: { userId: string }) => {
+        
         socket.broadcast.emit("userLogin", { userId: data.userId });
+        console.log(
+          `Numero de clientes conectados tras login de ==>> ${data.userId}`,
+          this.io.engine.clientsCount
+        );
+      });
+
+      socket.on("joinChatRoom", async (data: { userId: string }) => {
+        socket.join(data.userId);
       });
 
       socket.on(
@@ -46,6 +62,7 @@ class SocketService {
             });
           }
           //3- Emito el contenido del mensaje para que el front actualice aitomaticamente el mensaje en directo
+          // socket.to(sender).emit("getPrivateMessage", data.message);
           socket.to(receiver).emit("getPrivateMessage", data.message);
         }
       );
@@ -54,7 +71,7 @@ class SocketService {
         "clearPrivateUnreadMessages",
         async (data: {
           chatId: string;
-          receiverId: string;//se pasará el id del usuario que está abriendo el chat
+          receiverId: string; //se pasará el id del usuario que está abriendo el chat
           // message: { content: string; sender: string; receiver: string };
         }) => {
           const chat = await Chat.findById(data.chatId)
@@ -80,6 +97,10 @@ class SocketService {
       socket.on("userLogout", (data: { userId: string }) => {
         socket.leave(data.userId);
         socket.broadcast.emit("userLogout", { userId: data.userId });
+        console.log(
+          `Numero de clientes conectados tras logout de ==>> ${data.userId}`,
+          this.io.engine.clientsCount
+        );
       });
     });
   }

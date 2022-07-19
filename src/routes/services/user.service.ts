@@ -11,7 +11,7 @@ import {
   USERNAME_ALREADY_EXISTS_ERROR,
   USER_NOT_FOUND_ERROR,
 } from "@/utils/errors.constant";
-import { Chat, IChat } from '../../models/Chat';
+import { Chat, IChat } from "../../models/Chat";
 import { IMessage } from "../../models/Message";
 
 const FIELDS_TO_EXCLUDE = { password: 0 };
@@ -229,8 +229,15 @@ async function getChats(
     })
       .populate<{ members: Array<IUser> }>("members")
       .populate<{ messages: Array<IMessage> }>("messages")
-      .populate<{ advertId: IAdvertisement }>("advertId").lean()) as any;
-    serviceResponse.data = chats;
+      .populate<{ advertId: IAdvertisement }>("advertId")
+      .lean()) as any;
+    const chatsClone = [...chats];
+    chatsClone.forEach((c) => {
+      c.members.forEach((m: any) => {
+        delete m.password;
+      });
+    });
+    serviceResponse.data = chatsClone;
   } catch (error) {
     const customError = buildCustomError(error);
     serviceResponse.status = customError.status || 500;
