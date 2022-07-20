@@ -1,5 +1,5 @@
 import ResponseI from "../controllers/models/response.model";
-import { IAdvertisement } from "../../models/Advertisement";
+import { IAdvertisement, Advertisement } from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
 import { IUser, User } from "../../models/User";
 import { buildCustomError, CustomError } from "../../utils/error.utils";
@@ -218,7 +218,8 @@ async function registerUser(
 }
 
 async function getChats(
-  userId: string
+  userId: string,
+  advertId?: string
 ): Promise<ResponseI<Array<IChat> | CustomError>> {
   const serviceResponse: ResponseI<Array<IChat> | CustomError> =
     getServiceResponseBase();
@@ -232,11 +233,29 @@ async function getChats(
       .populate<{ advertId: IAdvertisement }>("advertId")
       .lean()) as any;
     const chatsClone = [...chats];
+    const addNewChatForAdvert =
+      advertId &&
+      !chatsClone.some((c) => {
+        return c?.advertId?._id?.toString() === advertId;
+      });
+    if (addNewChatForAdvert) {
+      const advert = await Advertisement.findById(advertId)?.lean();
+      const senderUser = await User.findById(userId)?.lean();
+      const receiverUser = await User.findById(advert?.owner?.toString())?.lean();
+      const newChat = {
+        _id: null,
+        advertId: advert,
+        messages: [],
+        members: [senderUser, receiverUser],
+      };
+      chatsClone.push(newChat as any);
+    }
     chatsClone.forEach((c) => {
       c.members.forEach((m: any) => {
         delete m.password;
       });
     });
+
     serviceResponse.data = chatsClone;
   } catch (error) {
     const customError = buildCustomError(error);

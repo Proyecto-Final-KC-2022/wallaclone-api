@@ -117,8 +117,9 @@ export class User implements Controller {
   ) => {
     try {
       const { _id: userId } = decodeToken(req?.headers?.authorization);
+      const advertId = req?.query?.advertId?.toString();
       let controllerResponse: ResponseI<Array<any> | CustomError>;
-      controllerResponse = await userService.getChats(userId);
+      controllerResponse = await userService.getChats(userId, advertId);
 
       res
         .status(controllerResponse.status || 200)
