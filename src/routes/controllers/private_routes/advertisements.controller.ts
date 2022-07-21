@@ -58,6 +58,8 @@ export class Advertisements implements Controller {
       console.log("*********** req.file ***********");
       console.log(req.file);
 
+      const { _id: userId } = decodeToken(req?.headers?.authorization);
+
       const anuncio = {
         body: req.body as {
           name: string;
@@ -67,7 +69,6 @@ export class Advertisements implements Controller {
           price: number;
           tags: any;
           creationDate: string;
-          owner: any;
           preOrdered: boolean;
           sold: boolean;
         },
@@ -82,7 +83,7 @@ export class Advertisements implements Controller {
         anuncio["body"].price,
         anuncio["body"].tags,
         anuncio["body"].creationDate,
-        anuncio["body"].owner,
+        userId,
         anuncio["body"].preOrdered,
         anuncio["body"].sold
       );
