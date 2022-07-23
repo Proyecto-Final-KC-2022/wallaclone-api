@@ -20,7 +20,6 @@ class SocketService {
       );
       /* Recepcion del evento login para añadir el usuario a la */
       socket.on("login", async (data: { userId: string }) => {
-        
         socket.broadcast.emit("userLogin", { userId: data.userId });
         console.log(
           `Numero de clientes conectados tras login de ==>> ${data.userId}`,
@@ -63,7 +62,10 @@ class SocketService {
           }
           //3- Emito el contenido del mensaje para que el front actualice aitomaticamente el mensaje en directo
           // socket.to(sender).emit("getPrivateMessage", data.message);
-          socket.to(receiver).emit("getPrivateMessage", data.message);
+          socket.to(receiver).emit("getPrivateMessage", {
+            chatId: data.chatId,
+            message: message["_doc"],
+          });
         }
       );
 
@@ -88,11 +90,19 @@ class SocketService {
             { $set: { read: true } },
             { multi: true }
           );
-          //1- modificar los mensajes donde deceiver sea igual a receiverId y tengan el campo read como false, ponerlo a true
-          //2- emitir evento para que el front actualice la forma de pintar los mensajes, y los pinte ya como leidos
-          socket.to(data.receiverId).emit("setMessagesAsRead", true);
         }
       );
+
+      socket.on(
+        "allMessagesAreRead",
+        (data: { read: boolean; currentUserId: string }) => {
+          socket.emit("setMessagesAsRead", data.read);
+        }
+      );
+
+      socket.on("setUnreadChatMessage", (currentUserId: string) => {
+        socket.emit("messageUnread", true);
+      });
 
       socket.on("userLogout", (data: { userId: string }) => {
         socket.leave(data.userId);
