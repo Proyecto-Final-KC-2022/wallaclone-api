@@ -6,9 +6,6 @@ import bodyParser from "body-parser";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-
-import indexRouter from "./routes/index";
-import usersRouter from "./routes/users";
 import { MongooseConnection } from "./connectMongoose";
 import ControllerI from "./routes//controllers/models/controller.model";
 //Rutas privadas
