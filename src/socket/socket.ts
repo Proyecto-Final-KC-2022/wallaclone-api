@@ -76,6 +76,7 @@ class SocketService {
           receiverId: string; //se pasará el id del usuario que está abriendo el chat
           // message: { content: string; sender: string; receiver: string };
         }) => {
+          if (data.chatId) {
           const chat = await Chat.findById(data.chatId)
             .populate<{ messages: Array<IMessage> }>("messages")
             .orFail()
@@ -90,6 +91,7 @@ class SocketService {
             { $set: { read: true } },
             { multi: true }
           );
+          }
         }
       );
 
