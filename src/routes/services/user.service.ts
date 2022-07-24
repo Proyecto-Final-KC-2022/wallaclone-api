@@ -1,14 +1,18 @@
 import ResponseI from "../controllers/models/response.model";
-import { IAdvertisement } from "../../models/Advertisement";
+import { IAdvertisement, Advertisement } from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
 import { IUser, User } from "../../models/User";
+import { buildCustomError, CustomError } from "../../utils/error.utils";
 import {
-  buildCustomError,
-  CustomError
-} from "../../utils/error.utils";
-import { EMAIL_ALREADY_EXISTS_ERROR, FAVORITE_ALREADY, INVALID_FAVORITE_ADVERTS, MISSING_FIELDS_ERROR, USERNAME_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR } from "@/utils/errors.constant";
-
-
+  EMAIL_ALREADY_EXISTS_ERROR,
+  FAVORITE_ALREADY,
+  INVALID_FAVORITE_ADVERTS,
+  MISSING_FIELDS_ERROR,
+  USERNAME_ALREADY_EXISTS_ERROR,
+  USER_NOT_FOUND_ERROR,
+} from "@/utils/errors.constant";
+import { Chat, IChat } from "../../models/Chat";
+import { IMessage } from "../../models/Message";
 
 const FIELDS_TO_EXCLUDE = { password: 0 };
 
@@ -213,6 +217,55 @@ async function registerUser(
   return serviceResponse;
 }
 
+async function getChats(
+  userId: string,
+  advertId?: string
+): Promise<ResponseI<Array<IChat> | CustomError>> {
+  const serviceResponse: ResponseI<Array<IChat> | CustomError> =
+    getServiceResponseBase();
+
+  try {
+    const chats: Array<IChat> = (await Chat.find({
+      members: { $in: [userId] },
+    })
+      .populate<{ members: Array<IUser> }>("members")
+      .populate<{ messages: Array<IMessage> }>("messages")
+      .populate<{ advertId: IAdvertisement }>("advertId")
+      .lean()) as any;
+    const chatsClone = [...chats];
+    const addNewChatForAdvert =
+      advertId &&
+      !chatsClone.some((c) => {
+        return c?.advertId?._id?.toString() === advertId;
+      });
+    if (addNewChatForAdvert) {
+      const advert = await Advertisement.findById(advertId)?.lean();
+      const senderUser = await User.findById(userId)?.lean();
+      const receiverUser = await User.findById(advert?.owner?.toString())?.lean();
+      const newChat = {
+        _id: null,
+        advertId: advert,
+        messages: [],
+        members: [senderUser, receiverUser],
+      };
+      chatsClone.push(newChat as any);
+    }
+    chatsClone.forEach((c) => {
+      c.members.forEach((m: any) => {
+        delete m.password;
+      });
+    });
+
+    serviceResponse.data = chatsClone;
+  } catch (error) {
+    const customError = buildCustomError(error);
+    serviceResponse.status = customError.status || 500;
+    serviceResponse.data = customError;
+  }
+
+  return serviceResponse;
+}
+
 export {
   getUsers,
   getUserById,
@@ -221,6 +274,7 @@ export {
   getFavorites,
   deleteUser,
   registerUser,
+  getChats,
 };
 
 async function checkIfuserExists(userId: string): Promise<boolean> {

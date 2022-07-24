@@ -7,6 +7,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import app from "../src/app";
+import socket from "../src/socket/socket";
 import Debug from "debug";
 import http from "http";
 
@@ -27,6 +28,11 @@ app.set("port", port);
  */
 
 const server = http.createServer(app);
+/**
+ * Initialize socket on express server
+ */
+socket.startServerListener(server);
+
 
 /**
  * Listen on provided port, on all network interfaces.

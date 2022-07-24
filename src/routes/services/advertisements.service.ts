@@ -5,6 +5,7 @@ import {
   IAdvertisement,
 } from "../../models/Advertisement";
 import { getServiceResponseBase } from "./base.service.utils";
+import { IUser } from '../../models/User';
 import {
   buildCustomError,
   CustomError,
@@ -74,12 +75,13 @@ async function geAdvertisementById(
     getServiceResponseBase();
 
   try {
-    const advertisement = (await Advertisement.findById(
+    const advertisement = await Advertisement.findById(
       id
-    )) as IAdvertisement & { _id: any };
-
-    if (advertisement) {
-      serviceResponse.data = advertisement;
+    ).populate<{ owner: IUser }>("owner").lean() as any;
+    const advertisementClone = {...advertisement};
+    delete advertisementClone?.owner?.password;
+    if (advertisementClone) {
+      serviceResponse.data = advertisementClone;
     } else {
       serviceResponse.data = ADVERT_NOT_FOUND_ERROR;
       serviceResponse.status = ADVERT_NOT_FOUND_ERROR.status || 500;
