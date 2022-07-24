@@ -77,7 +77,7 @@ export class Advertisements implements Controller {
       let controllerResponse: any;
       controllerResponse = await advertisementsService.createAdvertisement(
         anuncio["body"].name,
-        req.file["location"],
+        req?.file?.["location"],
         anuncio["body"].description,
         anuncio["body"].forSale,
         anuncio["body"].price,
