@@ -81,7 +81,7 @@ export class Advertisements implements Controller {
         anuncio["body"].description,
         anuncio["body"].forSale,
         anuncio["body"].price,
-        anuncio["body"].tags,
+        anuncio["body"]?.tags?.split(','),
         anuncio["body"].creationDate,
         userId,
         anuncio["body"].preOrdered,
